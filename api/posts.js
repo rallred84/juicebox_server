@@ -74,7 +74,7 @@ postsRouter.patch('/:postId', requireUser, async (req, res, next) => {
 
     if (originalPost.author.id === req.user.id) {
       const updatedPost = await updatePost(postId, updateFields);
-      res.send({ post: updatedPost });
+      res.send({ success: true, post: updatedPost });
     } else {
       next({
         name: 'UnauthorizedUserError',
@@ -98,18 +98,19 @@ postsRouter.delete('/:postId', requireUser, async (req, res, next) => {
       const deletedPost = await updatePost(post.id, {
         active: false,
       });
-      console.log('jkjfkdjfksd', deletedPost);
 
       res.send({ post: deletedPost });
     } else {
       next(
         post
           ? {
+              success: false,
               name: 'UnauthorizedUserError',
               message:
                 'You cannot delete a post that you are not the author of',
             }
           : {
+              success: false,
               name: 'PostNotFoundError',
               message: 'A post with that ID does not exist',
             }

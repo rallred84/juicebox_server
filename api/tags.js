@@ -25,9 +25,13 @@ tagsRouter.get('/:tagName/posts', async (req, res, next) => {
     );
 
     if (posts.length > 0) {
-      res.send(posts);
+      res.send({
+        success: true,
+        posts,
+      });
     } else {
       next({
+        success: false,
         name: 'TagNameDoesNotExist',
         message: 'This Tag name does not exist, try another.',
       });

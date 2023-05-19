@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const { getUserById } = require('../db');
 const { JWT_SECRET } = process.env;
 
+//Authenticate User
 apiRouter.use(async (req, res, next) => {
   const prefix = 'Bearer ';
   const auth = req.headers.authorization;
@@ -26,6 +27,7 @@ apiRouter.use(async (req, res, next) => {
     }
   } else {
     next({
+      success: false,
       name: 'AuthorizationHeaderError',
       message: `Authorization token must start with ${prefix}`,
     });
@@ -49,6 +51,7 @@ apiRouter.use('/tags', tagsRouter);
 
 apiRouter.use((error, req, res, next) => {
   res.send({
+    success: error.success,
     name: error.name,
     message: error.message,
   });
