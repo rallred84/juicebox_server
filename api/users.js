@@ -158,4 +158,70 @@ usersRouter.delete('/:userId', requireUser, async (req, res, next) => {
   }
 });
 
+// Reactivate or Update User
+
+usersRouter.patch('/:userId', requireUser, async (req, res, next) => {
+  const user = await getUserById(req.params.userId);
+
+  // If no user, send error
+  if (!user) {
+    res.send({
+      success: false,
+      name: 'NoUserFoundError',
+      message: 'No user was found that matches this ID',
+    });
+  }
+
+  // If user matches params userId
+  if (user && user.id === req.user.id) {
+    const active = req.body.active;
+    //If currently deactivated user, can only change to active
+    if (!user.active) {
+      const reInstatedUser = await updateUser(user.id, { active: true });
+      res.send({
+        success: true,
+        reInstatedUser,
+      });
+    }
+    // If active user, can change all user settings EXCEPT for active
+    // (That is handled by the DELETE path)
+    if (user.active) {
+      const updateFields = {};
+      const { name, username, location, password } = req.body;
+
+      if (name) {
+        updateFields.name = name;
+      }
+      if (username) {
+        updateFields.username = username;
+      }
+      if (location) {
+        updateFields.location = location;
+      }
+      if (password) {
+        hashedPassword = await bcrypt.hash(password, SALT);
+        updateFields.password = hashedPassword;
+      }
+
+      const reInstatedUser = await updateUser(user.id, updateFields);
+      res.send({
+        success: true,
+        reInstatedUser,
+      });
+    }
+  } else {
+    //If user does not match parms userId
+    res.send({
+      success: false,
+      name: 'CannotModifyOtherUsersError',
+      message: 'You cannot modify other users',
+    });
+  }
+
+  try {
+  } catch ({ name, message }) {
+    next({ name, message });
+  }
+});
+
 module.exports = usersRouter;
