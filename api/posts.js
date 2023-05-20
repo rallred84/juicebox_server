@@ -14,17 +14,21 @@ postsRouter.use((req, res, next) => {
 
 //Get All Posts
 postsRouter.get('/', async (req, res) => {
-  const allPosts = await getAllPosts();
+  try {
+    const allPosts = await getAllPosts();
 
-  //Will return all posts that are either active OR owned by the user
-  const posts = allPosts.filter(
-    (post) =>
-      (post.active && post.author.active) || post.author.id === req.user?.id
-  );
+    //Will return all posts that are either active OR owned by the user
+    const posts = allPosts.filter(
+      (post) =>
+        (post.active && post.author.active) || post.author.id === req.user?.id
+    );
 
-  res.send({
-    posts,
-  });
+    res.send({
+      posts,
+    });
+  } catch ({ name, message }) {
+    next({ name, message });
+  }
 });
 
 //Create a Post
@@ -48,7 +52,7 @@ postsRouter.post(
       //  Need to set up more error scenarios
 
       if (post) {
-        res.send(post);
+        res.send({ success: true, post });
       }
     } catch ({ name, message }) {
       next({ name, message });
