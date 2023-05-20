@@ -7,7 +7,7 @@ const client = new Client(
         password: 'postgres',
         user: 'postgres',
       }
-    : 'postgres://juicebox_jwxw_user:idoS7k327DgbwrG5vK1YHItxL5eKb07j@dpg-chkdr9bhp8uej77t7emg-a/juicebox_jwxw'
+    : process.env.DB_URL
 );
 
 /**
